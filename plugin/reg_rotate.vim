@@ -54,9 +54,7 @@ function! CRotate()
         if (g:c_rotate_flag == 0)
             " TODO: - Change that part its ugly
             "       - Remove get_method from list
-            let l:meth = ExecCmd("py print CUtility.get_method()")
-            let l:meth = substitute(l:meth, '\[\(.*\)\]', '\1', '')
-            let l:meth = split(l:meth, ',')
+            let l:meth = Str2List(ExecCmd("py print CUtility.get_method()"))
             if l:counter < len(l:meth) && l:meth[l:counter] != "get_method"
                 let l:cmd = "py print getattr(CUtility,".l:meth[l:counter] .")()"
                 let l:tmp  = ExecCmd(l:cmd)
@@ -65,10 +63,7 @@ function! CRotate()
             endif
             call setreg(l:k, l:tmp)
         elseif(g:c_rotate_flag == 1)
-            
-            let l:meth = ExecCmd("py print CFunction.get_method()")
-            let l:meth = substitute(l:meth, '\[\(.*\)\]', '\1', '')
-            let l:meth = split(l:meth, ',')
+            let l:meth = Str2List(ExecCmd("py print CFunction.get_method()"))
             if l:counter < len(l:meth) && l:meth[l:counter] != "get_method"
                 let l:cmd = "py print getattr(CFunction,".l:meth[l:counter] .")()"
                 let l:tmp  = ExecCmd(l:cmd)
@@ -87,6 +82,12 @@ function! CRotate()
         let g:c_rotate_flag += 1
     endif
 endfunction
+function! Str2List(str)
+    let l:list = substitute(a:str, '\[\(.*\)\]', '\1', '')
+    let l:list = split(l:list, ',')
+    return l:list
+endfunction
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " @function: TestRotate
 " @description: test for Rotate
