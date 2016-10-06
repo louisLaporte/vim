@@ -22,6 +22,8 @@ function! BeforeRotate()
 endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " @function: Rotate
+" @arguments:
+"           - language = language name
 " @description: Change register content and start rotation
 " 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -29,9 +31,10 @@ function! Rotate(language)
     call BeforeRotate()
     let g:reg_rotate_flag = 1
 
-    "echo g:reg_backup
     if a:language ==? "c"
         call CRotate()
+    " elseif a:language ==? "py"
+    "     call PyRotate()
     endif
 endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -45,23 +48,36 @@ function! CRotate()
     endif
 
   echo "reg rotate ".g:c_rotate_flag
+  let l:counter = -1
     for [l:k, l:v] in items(g:reg_backup)
-        if empty(l:v)
-            call setreg(l:k, '')
-        else
-            if (g:c_rotate_flag == 0)
-                redir => l:tmp
-                    silent! py print CUtility.for_loop()
-                redir END
-                call setreg(l:k, l:tmp)
-            elseif(g:c_rotate_flag == 1) 
-                redir => l:tmp
-                    silent! py print CFunction.mainFunction()
-                redir END
-                call setreg(l:k, l:tmp)
-            elseif(g:c_rotate_flag == 2)
-                call setreg(l:k, l:v)
+        let counter +=1
+        if (g:c_rotate_flag == 0)
+            " TODO: - Change that part its ugly
+            "       - Remove get_method from list
+            let l:meth = ExecCmd("py print CUtility.get_method()")
+            let l:meth = substitute(l:meth, '\[\(.*\)\]', '\1', '')
+            let l:meth = split(l:meth, ',')
+            if l:counter < len(l:meth) && l:meth[l:counter] != "get_method"
+                let l:cmd = "py print getattr(CUtility,".l:meth[l:counter] .")()"
+                let l:tmp  = ExecCmd(l:cmd)
+            else
+                let l:tmp = ''
             endif
+            call setreg(l:k, l:tmp)
+        elseif(g:c_rotate_flag == 1)
+            
+            let l:meth = ExecCmd("py print CFunction.get_method()")
+            let l:meth = substitute(l:meth, '\[\(.*\)\]', '\1', '')
+            let l:meth = split(l:meth, ',')
+            if l:counter < len(l:meth) && l:meth[l:counter] != "get_method"
+                let l:cmd = "py print getattr(CFunction,".l:meth[l:counter] .")()"
+                let l:tmp  = ExecCmd(l:cmd)
+            else
+                let l:tmp = ''
+            endif
+            call setreg(l:k, l:tmp)
+        elseif(g:c_rotate_flag == 2)
+            call setreg(l:k, l:v)
         endif
      endfor
     " next rotation
@@ -81,5 +97,20 @@ function! TestRotate()
      unlet g:reg_rotate_flag
      call Rotate()
 endfunction
+
+function! ExecCmd(cmd)
+    redir => message
+        silent execute a:cmd
+    redir END
+    if empty(message)
+        echoerr "no output"
+        return -1
+    else
+    " use "new" instead of "tabnew" below if you prefer split windows 
+    " instead of tabs tabnew
+        return message
+    endif
+endfunction
+command! -nargs=+ -complete=command ExecCmd call ExecCmd(<q-args>)
 
 nnoremap  <leader>r   :call Rotate('c')<Enter>
