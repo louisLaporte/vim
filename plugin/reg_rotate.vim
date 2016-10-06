@@ -1,79 +1,10 @@
-function! PyUtility()
-python << PYEND
-# -*- coding: utf-8 -*-
-import vim
-import sys
-import time
-class CUtility(object):
-    @classmethod
-    def for_loop(cls):
-        text=\
-"""for(;;) {
-
-}
-"""
-        return text
-    @classmethod
-    def while_loop(cls):
-        text=\
-"""while() {
-
-}
-"""
-        return text
-
-    @classmethod
-    def switch_case(cls):
-        text=\
-"""switch () {
-    case :
-
-    break;
-    default:
-    
-    break;
-}
-"""
-        return text
-
-class CFunction(object):
-    @classmethod
-    def mainFunction(cls):
-        text=\
-"""#include <stdio.h>
-#include<stdlib.h>
-int main(void) {
-
-    return 0;
-}
-"""
-        return text
-class CInsert(object):
-    def __init__(self):
-        self.w = vim.current.window
-        self.b = vim.current.buffer
-        self.l = vim.current.line
-    def run(self):
-             print "hello\nhello2\n\nhello3" 
-             cc=CUtility.for_loop()
-             l=len(cc.switch_case().split('\n'))
-             t = cc.switch_case().split('\n')
-             r,c = self.w.cursor
-             self.b[r:l-1]=t
-PYEND
-endfunction
-
-function! ExeC()
-    :call PyUtility()
-endfunction
-
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " @function: BeforeRotate
 " @description: Create backup of current registers from a to z in a
 " dictionary
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 function! BeforeRotate()
-    call PyUtility()
+    pyfile reg_rotate.py
     if ! exists("g:reg_rotate_flag")
         let g:reg_rotate_flag = 0
     endif
@@ -106,7 +37,7 @@ endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " @function: Rotate
 " @description: Rotation for the C language
-" 
+"
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 function! CRotate()
     if ! exists("g:c_rotate_flag")
