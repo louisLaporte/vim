@@ -22,8 +22,8 @@ function! BeforeRotate()
 endfunction
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " @function: Rotate
-" @arguments:
-"           - language = language name
+" @param:
+"       - language = language name
 " @description: Change register content and start rotation
 " 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -82,12 +82,18 @@ function! CRotate()
         let g:c_rotate_flag += 1
     endif
 endfunction
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" @function: Str2List
+" @param:
+"       - str = string to convert
+" @description: convert a string to a list
+"
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 function! Str2List(str)
     let l:list = substitute(a:str, '\[\(.*\)\]', '\1', '')
     let l:list = split(l:list, ',')
     return l:list
 endfunction
-
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " @function: TestRotate
 " @description: test for Rotate
@@ -98,7 +104,13 @@ function! TestRotate()
      unlet g:reg_rotate_flag
      call Rotate()
 endfunction
-
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" @function: ExecCmd
+" @param: 
+"       - cmd = command to output
+" @description: return a command output
+" 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 function! ExecCmd(cmd)
     redir => message
         silent execute a:cmd
